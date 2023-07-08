@@ -77,6 +77,8 @@ class DataLoader():
         # Remove redundant/meaningful variables (EmployeeCount, StandardHours)
         while True:
             del_col = str(input("Which variable need to be deleted?(Enter the variable name, or enter 'skip' to skip)"))
+            print("Delete EmployeeCount, StandardHours, Over18")
+
             if del_col.lower() == 'skip':
                 print("As you wish! The step is skipped!")
                 break
