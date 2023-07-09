@@ -60,109 +60,37 @@ class DataLoader():
 
     def save_dataset(self):
         # save current dataset as cleaned data
+        output_path = "./Dataset/cleaned_Employee_Attrition.xlsx"
+        self.dataset.to_excel(output_path, index=False)
+
         output_path = "./Dataset/cleaned_Employee_Attrition.csv"
         self.dataset.to_csv(output_path, index=False)
-        print("Dataset saved!")
+        print("Dataset saved as both csv and excel!")
 
     # ---------------------------Interactive Pipeline Process-------------------------
     def run_pipeline(self):
         # Read the data, and show basic info
-        print("Data loaded! The basic info is displayed below:")
-        print("The first 3 rows: \n")
-        self.show_head(3)
-
-        print("The descriptive info of each variable: \n")
-        self.show_description()
+        print("Data loaded! Run the cleaning pipeline now ...")
 
         # Remove redundant/meaningful variables (EmployeeCount, StandardHours)
-        while True:
-            del_col = str(input("Which variable need to be deleted?(Enter the variable name, or enter 'skip' to skip)"))
-            if del_col.lower() == 'skip':
-                print("As you wish! The step is skipped!")
-                break
-            
-            elif del_col in self.dataset_varlist:
-                self.delete_column(del_col)
-                print("{0} is deleted!".format(del_col))
-                continue
-
-            else:
-                print("Varibale not found in the dataset. Available variables are: /n", self.dataset_varlist)
-                continue
+        rm_varlist = ["EmployeeCount", "StandardHours", "Over18"]
+        for var in rm_varlist:
+            self.delete_column(var)
+            print("{0} is deleted!".format(var))
 
         # Replace values in certain varibales
-        while True:
-            col_name = str(input("Which variable's value need to be replaced?(Enter the variable name first, or enter 'skip' to skip the step)"))
-            if col_name.lower() == 'skip':
-                print("As you wish! The step is skipped!")
-                break
-            
-            elif col_name in self.dataset_varlist:
-                # show unique values
-                unique_values = self.dataset[col_name].unique()
-                print("You are focusing on varibale {0}. The unique values are: \n{1}".format(col_name, unique_values))
-                dict_string = input("Please enter dictionary-like string for replacement (i.e., {'Yes': 1, 'No': 0}).")
-                dict_string = eval(dict_string)
-
-                if isinstance(dict_string, dict):
-                    # replace the value
-                    self.replace_values(col_name, dict_string)
-                    print("Changed!")
-                else:
-                    print("Invalid input. Please enter a dictionary-like string.")
-
-                continue
-
-            else:
-                print("Varibale not found in the dataset. Available variables are: \n", self.dataset_varlist)
-                continue
+        map_list = {"Attrition":{"Yes": 1, "No": 0}}
+        for key, value in map_list.items():
+            self.replace_values(key, value)
+            print("Changed the value in variable {0}, mapping rules are {1}!".format(key, value))
+   
         # data_loader.replace_values("Attrition", {"Yes": 1, "No": 0})
 
         # Change variable type
-        print("The variable information: \n")
-        self.show_variable_info()
-
-        while True:
-            col_name = input("Which varibale's data type needs to be changed? (Enter the varibale name first, or enter 'skip' to skip the step)")
-
-            if col_name.lower() == "skip":
-                print("As you wish! The step is skipped!")
-                break
-
-            elif col_name in self.dataset_varlist:
-                print("You are focuing on ", col_name)
-
-                while True:
-                    new_type = input("Which type it should be?(int, float, str, bool)")
-
-                    if str(new_type) in ['int', 'float', 'str', 'bool']:
-                        self.change_var_type(col_name, eval(new_type))
-                        print("Changed!")
-                        break
-
-                    else: 
-                        print("only the 4 types are acceptable!")
-                        continue
-
-                continue
-
-            else:
-                print("Varibale not found in the dataset. Available variables are: \n", self.dataset_varlist)
-                continue
-
-        # Check Missing values
-        print("Missing value checking: \n")
-        self.check_missingValues()
-        while True: 
-            miss_val = input("How to deal with the missing values? (Enter skip to skip the step)")
-            
-            if miss_val.lower() == 'skip':
-                print("As you wish! The step is skipped!")
-                break
-
-            else:
-                print("You can only enter skip now!")
-                continue
+        var_type = {"Attrition": int}
+        for var, data_type in var_type.items():
+            self.change_var_type(var, data_type)
+            print("Transformed the variable {0} to data type {1}".format(var, str(data_type)))
         
         # Export the cleaned data
         self.save_dataset()
