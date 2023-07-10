@@ -2,8 +2,8 @@
 import numpy as np
 import pandas as pd
 from scipy.stats import chi2_contingency
+from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
-import prince
 from IPython.display import display
 
 class Stat_Tester():
@@ -40,5 +40,35 @@ class Stat_Tester():
 
         else:
             print("Invalid variable name(s), all available variables: \n", self.varlist)
+
+
+    def mannwhiteney_test(self, var_name):
+        # conduct mann-whiteney test to compare two groups value (non-parametrical test)
+        if var_name not in self.varlist:
+            print("Invalid variable! Available variables: \n", self.varlist)
+            return
+        
+        # select the two groups of data array
+        print("\n------ Test variable: {0}------".format(str(var_name)))
+        attrition_values = self.dataset.loc[self.dataset['Attrition'] == 1, str(var_name)].values
+        attrition_values = np.array(attrition_values)
+
+        not_attrition_values = self.dataset.loc[self.dataset['Attrition'] == 0, str(var_name)].values
+        not_attrition_values = np.array(not_attrition_values)
+
+        # perform the test: attrition group is smaller than not-attrition group
+        # --{'two-sided', 'greater', 'less'}
+        statistic, p_value = mannwhitneyu(attrition_values, not_attrition_values, alternative='less')
+
+        # Print the test statistic and p-value
+        print("Mann-Whitney U statistic:", round(statistic, 4))
+        print("p-value:", round(p_value, 4))
+
+        if round(p_value) < 0.05:
+            print("Conclusion: attrition group's {0} is SIGNIFICANTLY smaller than non-attrition group's.".format(str(var_name)))
+        else:
+            print("Conclusion: attrition group's {0} is INSIGNIFICANTLY smaller than non-attrition group's.".format(str(var_name)))
+ 
+
 
 
