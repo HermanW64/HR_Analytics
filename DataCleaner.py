@@ -4,7 +4,7 @@ import numpy as np
 from IPython.display import display
 
 
-class DataLoader():
+class DataCleaner():
     def __init__(self, fileName):
         path = "./Dataset/" + str(fileName)
         self.dataset = pd.read_csv(path)
